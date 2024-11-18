@@ -1,0 +1,23 @@
+{
+  "name": "coding-guidelines",
+  "version": "1.0.0",
+  "description": "This repository contains linting and formatting guidelines for React Native projects. It enforces coding standards using ESLint and Prettier.",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-company:xtbiju-rakbank/project-linting-guildelines.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@react-native-community/eslint-config": "^3.2.0",
+    "eslint": "^8.57.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  }
+}
