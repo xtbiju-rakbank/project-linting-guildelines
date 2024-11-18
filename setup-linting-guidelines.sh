@@ -1,14 +1,34 @@
+
 #!/bin/bash
 
-# Bash script to set up linting guidelines for a React Native project.
-# This script uses existing .eslintrc.js and .prettierrc.js files from the root directory.
-
-# Ensure the script stops on any error
+# Stop script on any error
 set -e
 
-echo "Initializing linting guidelines setup..."
+echo "Initializing Linting Guidelines Setup..."
 
-# Check if necessary configuration files exist
+# Check if the script is executed in a git repository
+if [ ! -d ".git" ]; then
+  echo "Error: This script must be run in the root of a git repository."
+  exit 1
+fi
+
+# Default to Yarn but allow user to choose npm
+read -p "Use Yarn for package management? (y/n, default: y): " use_yarn
+use_yarn=${use_yarn:-y}
+
+if [[ "$use_yarn" == "y" || "$use_yarn" == "Y" ]]; then
+  PACKAGE_MANAGER="yarn"
+  RUN_COMMAND="yarn"
+  INSTALL_COMMAND="yarn add --dev"
+else
+  PACKAGE_MANAGER="npm"
+  RUN_COMMAND="npm run"
+  INSTALL_COMMAND="npm install --save-dev"
+fi
+
+echo "Using $PACKAGE_MANAGER for package management."
+
+# Ensure necessary files exist
 if [ ! -f ".eslintrc.js" ]; then
   echo "Error: .eslintrc.js file is missing in the root directory. Please add it and rerun the script."
   exit 1
@@ -19,12 +39,7 @@ if [ ! -f ".prettierrc.js" ]; then
   exit 1
 fi
 
-# Create the necessary directories and files
-mkdir -p .husky
-touch .husky/pre-commit
-chmod +x .husky/pre-commit
-
-# Write .lintstagedrc.json
+# Add .lintstagedrc.json
 cat > .lintstagedrc.json <<EOL
 {
   "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
@@ -34,61 +49,35 @@ cat > .lintstagedrc.json <<EOL
 EOL
 echo ".lintstagedrc.json created."
 
-# Write Husky pre-commit hook
+# Initialize project if not already done
+if [ ! -f "package.json" ]; then
+  echo "Initializing project..."
+  if [ "$PACKAGE_MANAGER" == "yarn" ]; then
+    yarn init -y
+  else
+    npm init -y
+  fi
+fi
+
+# Install dependencies
+echo "Installing dependencies..."
+$INSTALL_COMMAND eslint prettier husky lint-staged @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-prettier eslint-config-prettier
+
+# Set up Husky
+echo "Setting up Husky pre-commit hook..."
+npx husky install
+mkdir -p .husky
 cat > .husky/pre-commit <<EOL
 #!/bin/sh
 . "\$(dirname "\$0")/_/husky.sh"
 
-npx lint-staged
+$RUN_COMMAND lint-staged
 EOL
-echo "Husky pre-commit hook created."
+chmod +x .husky/pre-commit
+echo "Husky pre-commit hook configured."
 
-# Write README.md
-cat > README.md <<EOL
-# Project Linting Guidelines
+# Add lint-staged configuration to package.json
+echo "Configuring lint-staged in package.json..."
+npx json -I -f package.json -e 'this["lint-staged"]={"*.{js,jsx,ts,tsx}":["eslint --fix","prettier --write"],"*.json":["prettier --write"],"*.md":["prettier --write"]}'
 
-This repository contains linting and formatting guidelines for React Native projects.
-
-## Setup Instructions
-
-1. Ensure that the \`.eslintrc.js\` and \`.prettierrc.js\` files exist in the root directory.
-
-2. Install the dependencies:
-
-   \`\`\`bash
-   npm install
-   \`\`\`
-
-3. Add the following to your \`package.json\` scripts:
-
-   \`\`\`json
-   {
-     "scripts": {
-       "lint": "eslint .",
-       "format": "prettier --write ."
-     }
-   }
-   \`\`\`
-
-4. Husky hooks are already configured. Commit changes to check the linting process.
-
-## Contributing
-
-Feel free to submit issues or improvements.
-EOL
-echo "README.md created."
-
-# Initialize npm if not already done
-if [ ! -f "package.json" ]; then
-  echo "Initializing npm..."
-  npm init -y
-fi
-
-# Install necessary dependencies
-echo "Installing dependencies..."
-npm install --save-dev eslint prettier lint-staged husky @typescript-eslint/parser @typescript-eslint/eslint-plugin eslint-plugin-react eslint-plugin-import eslint-plugin-prettier
-
-# Install Husky
-npx husky install
-
-echo "Linting guidelines setup completed successfully! The repository now uses the .eslintrc.js and .prettierrc.js files from the root directory."
+echo "Integration completed successfully! Your project is now set up with $PACKAGE_MANAGER."
