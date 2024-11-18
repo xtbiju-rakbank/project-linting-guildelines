@@ -1,0 +1,96 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "prettier",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": 2018,
+    "sourceType": "module"
+  },
+  "plugins": ["react", "prettier", "@typescript-eslint", "import"],
+  "settings": {
+    "react": {
+      "version": "detect" // Automatically detect the react version
+    },
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  },
+  "rules": {
+    "quotes": "off",
+    "react/display-name": "off",
+    "jsx-a11y/anchor-is-valid": 0,
+    "react/prop-types": 0,
+    "react/jsx-uses-react": "error",
+    "react/jsx-uses-vars": "error",
+    "react-hooks/exhaustive-deps": "off",
+    "prettier/prettier": "error",
+    "no-empty": "warn",
+    "max-len": [
+      "warn",
+      { "code": 100, "ignoreUrls": true, "ignoreStrings": true }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-var-requires": "off",
+    "no-extra-boolean-cast": "off",
+    "no-debugger": "warn",
+    "no-async-promise-executor": "off",
+    "no-console": "error",
+    "no-prototype-builtins": "warn",
+    "camelcase": ["error", { "properties": "never" }],
+    "no-undef": "warn",
+    "no-unused-vars": "off",
+    "react/jsx-no-duplicate-props": "warn",
+    "no-dupe-keys": "warn",
+    "no-useless-escape": "warn",
+    "semi": ["error", "always"],
+    "comma-dangle": ["off", "never"],
+    "react/no-typos": 0,
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [".ts", ".tsx"]
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "external",
+          "builtin",
+          "internal",
+          "parent",
+          "sibling",
+          "index"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "external",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"],
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        }
+      }
+    ]
+  }
+}
